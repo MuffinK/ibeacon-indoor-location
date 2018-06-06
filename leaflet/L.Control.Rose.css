@@ -1,0 +1,19 @@
+ .large {
+ 	width: 100px;
+ 	height: auto;
+ }
+
+ .medium {
+ 	width: 75px;
+ 	height: auto;
+ }
+
+ .small {
+ 	width: 50px;
+ 	height: auto;
+ }
+
+ .xsmall {
+ 	width: 25px;
+ 	height: auto;
+ }

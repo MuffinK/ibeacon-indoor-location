@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "coordtransform": "^2.1.2"
+  }
+}
