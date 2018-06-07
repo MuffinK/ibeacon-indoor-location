@@ -7,11 +7,11 @@ dGraph.addNode(3, {weight: 1,nType: 1});
 dGraph.addNode(4, {weight: 1,nType: 1});
 dGraph.addNode(5, {weight: 1,nType: 1});
 dGraph.addNode(6, {weight: 1,nType: 1});
-dGraph.addEdge(1, 5);
-dGraph.addEdge(5, 2);
-dGraph.addEdge(2, 6);
-dGraph.addEdge(6, 3);
-dGraph.addEdge(5, 4);
+dGraph.addEdge(1, 2);
+dGraph.addEdge(2, 3);
+dGraph.addEdge(3, 4);
+dGraph.addEdge(4, 5);
+dGraph.addEdge(5, 6);
 
 var calcCurrentCoord = function (coord1, coord2, rssi1, rssi2) {
 
@@ -41,16 +41,16 @@ var imageBounds = {
     1: [
         L.latLng([31.252625753243095, 121.61278769373897]),
         L.latLng([31.252625753243095, 121.61364593165105]),
-        L.latLng([31.252323526119255, 121.61278769373897])
+        L.latLng([31.252254736217314, 121.61278769373897])
     ],
     2: [
         L.latLng([31.25234323889825, 121.61444248534508]),
-        L.latLng([31.252139162085495, 121.61444248534508]),
+        L.latLng([31.25211355882389, 121.61444248534508]),
         L.latLng([31.25234323889825, 121.61389799691509])
     ],
     3: [
-        L.latLng([31.251763275689502, 121.61416557139093]),
-        L.latLng([31.251386074872723, 121.61416557139093]),
+        L.latLng([31.251763275689502, 121.61423941947763]),
+        L.latLng([31.25134066674354, 121.61423941947763]),
         L.latLng([31.251763275689502, 121.61386516398126])
     ]
 };
@@ -83,33 +83,39 @@ var places = [{
     coord: [31.252359665779384, 121.61317619761121]
 }, {
     roomName: '大厅',building: '1',level: 1,roomNo: 1606,roomId: '大厅',beaconId: '9.101',routeId: 3,
-    coord: [22.37167485454961, 113.57036769390106]
+    coord: [31.252359665779384, 121.61317619761121]
 }, {
     roomName: '电梯',building: '1',level: 1,roomNo: 1606,roomId: '大厅',beaconId: '9.101',routeId: 4,
-    coord: [22.37167485454961, 113.57036769390106]
+    coord: [31.252359665779384, 121.61317619761121]
 }, {
     roomName: '电梯',building: '1',level: 6,roomNo: 1606,roomId: '大厅',beaconId: '9.101',routeId: 5,
-    coord: [22.37167485454961, 113.57036769390106]
+    coord: [31.252359665779384, 121.61317619761121]
 }, {
     roomName: '主会议室',building: '1',level: 6,roomNo: 1606,roomId: '大厅',beaconId: '9.101',routeId: 6,
-    coord: [22.37167485454961, 113.57036769390106]
+    coord: [31.252359665779384, 121.61317619761121]
 }, {
-    roomName: 'D306',building: 'D',level: 3,roomNo: 306,roomId: 'D306',beaconId: '9.102',routeId: 3,
+    roomName: 'D306',building: 'D',level: 3,roomNo: 306,roomId: 'D306',beaconId: '9.102',routeId: 7,
     coord: [22.37148391840292, 113.5702282190323]
 }, {
-    roomName: 'D401',building: 'D',level: 4,roomNo: 401,roomId: 'D401',beaconId: '9.103',routeId: 4,
+    roomName: 'D401',building: 'D',level: 4,roomNo: 401,roomId: 'D401',beaconId: '9.103',routeId: 8,
     coord: [22.37180389907296, 113.57043106108905]
 }, {
-    roomName: '楼梯#1',building: 'D',level: 3,roomId: 'steps3',beaconId: '9.104',routeId: 5,
+    roomName: '楼梯#1',building: 'D',level: 3,roomId: 'steps3',beaconId: '9.104',routeId: 9,
     coord: [22.3717264088571, 113.57041094452144]
 }, {
-    roomName: '楼梯#2',building: 'D',level: 3,roomId: 'steps4',beaconId: '9.105',routeId: 6,
+    roomName: '楼梯#2',building: 'D',level: 3,roomId: 'steps4',beaconId: '9.105',routeId: 10,
     coord: [22.37155706929526, 113.5702966153622]
 }];
+var placesByRoute = R.groupBy(R.path(['routeId']))(places);
 var meMarker;
 var route = function (nowPlace, targetPlace) {
     var results = Dijkstra.run(dGraph, 1, nowPlace.routeId, targetPlace.routeId);
     var path = Dijkstra.getPath(results.prev, targetPlace.routeId);
+
+    var polyline = L.polyline(R.filter(R.path([]))(R.map(function(routeId){
+        return R.path([routeId, 0, 'level'])(placesByRoute) == currentPlaceInList.level ? R.path([routeId, 0, 'coord'])(placesByRoute) : undefined;
+    })(path)), {color: 'green'}).addTo(map);
+    
     var disPlace = R.path([0])(R.filter(R.propEq('routeId')(R.path([1])(path)))(places))
     if(disPlace){
         var direction;
@@ -156,7 +162,11 @@ vueMap = new Vue({
             route.call(this, currentPlaceInList, newTarget);
         },
         currentPlace: function currentPlace(newPlace, oldPlace) {
-            R.path([R.path(['building'])(currentPlaceInList), R.path(['level'])(currentPlaceInList)])(groups)
+            var layer = R.path([R.path(['building'])(currentPlaceInList), R.path(['level'])(currentPlaceInList)])(groups)
+            var layerGroup = R.path([R.path(['building'])(currentPlaceInList), 'group'])(groups);
+            if(layerGroup && !layerGroup.hasLayer(layer)){
+                layerGroup.clearLayers().addLayer(layer);
+            }
             if(newPlace){
                 meMarker.setLatLng(newPlace);
                 route.call(this, currentPlaceInList, this.target);
@@ -188,7 +198,7 @@ vueMap = new Vue({
             iconSize: [20, 20], // size of the icon
             popupAnchor: [0, 0] // point from which the popup should open relative to the iconAnchor
         });
-        L.tileLayer.bing("Ao34rXdLP2sgv6PvoF1yyhvpFDqD8Dq0QmtGY0xbBLJO2MOBAK2le4FTagFOrrUQ").addTo(map)
+        // L.tileLayer.bing("Ao34rXdLP2sgv6PvoF1yyhvpFDqD8Dq0QmtGY0xbBLJO2MOBAK2le4FTagFOrrUQ").addTo(map)
         meMarker = L.marker([22.3732457, 113.57130540000001], {
             icon: greenIcon
         }).addTo(map);
@@ -286,6 +296,9 @@ vueMap = new Vue({
             
             beaconArray = {};
         }.bind(this), 3000);
+        setTimeout(function(){
+            map.setView([31.25245174500533, 121.61321564166883], 19);
+        }, 500)
     }
 });
 
