@@ -93,6 +93,12 @@ dGraph.addEdge(19, 20);
 dGraph.addEdge(10, 15);
 dGraph.addEdge(20, 16);
 
+dGraph.addEdge(21, 22);
+dGraph.addEdge(22, 23);
+dGraph.addEdge(23, 20);
+
+dGraph.addEdge(21, 9);
+
 
 var calcCurrentCoord = function (coord1, coord2, rssi1, rssi2) {
 
@@ -171,6 +177,19 @@ var places = [{
 }, {
     roomName: '3206',building: '3',level: 2, beaconId: '9.14',routeId: 18, 
     coord: [31.25156828414211, 121.61399124400192]
+    // 一栋
+}, {
+    roomName: '主会场',building: '1',level: 6, beaconId: '9.109',routeId: 20, target: true, 
+    coord: [31.252403333091145, 121.61293986719105]
+}, {
+    roomName: '大厅',building: '1',level: 6, beaconId: '9.105',routeId: 21, target: true, 
+    coord: [31.252313906284428, 121.61318931262942]
+}, {
+    roomName: '走廊',building: '1',level: 6, beaconId: '9.108',routeId: 22, target: true, 
+    coord: [31.252415944557082, 121.61306593101473]
+}, {
+    roomName: '电梯', building: '1',level: 6, beaconId: '9.111',routeId: 23, target: true, 
+    coord: [31.25240677258201, 121.61293718498202]
 }];
 var placesByRoute = R.groupBy(R.path(['routeId']))(places);
 var meMarker;
