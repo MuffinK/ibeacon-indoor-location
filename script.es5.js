@@ -1,32 +1,3 @@
-var pageControl = {};
-var routeNode = []
-var dGraph = new Graph();
-dGraph.addNode(1, {weight: 1,nType: 1});
-dGraph.addNode(2, {weight: 1,nType: 1});
-dGraph.addNode(3, {weight: 1,nType: 1});
-dGraph.addNode(4, {weight: 1,nType: 1});
-dGraph.addNode(5, {weight: 1,nType: 1});
-dGraph.addNode(6, {weight: 1,nType: 1});
-dGraph.addEdge(1, 2);
-dGraph.addEdge(2, 3);
-dGraph.addEdge(3, 4);
-dGraph.addEdge(4, 5);
-dGraph.addEdge(5, 6);
-
-var calcCurrentCoord = function (coord1, coord2, rssi1, rssi2) {
-
-    if (coord1 && coord2) {
-        var rssiToDistance = function (rssi) {
-            return Math.pow(10, (-59 - rssi) / 20);
-        }
-        var dis1 = rssiToDistance(rssi1),
-            dis2 = rssiToDistance(rssi2);
-
-        return [(coord1[0] * dis2 + coord2[0] * dis1) / (dis1 + dis2), (coord1[1] * dis2 + coord2[1] * dis1) / (dis1 + dis2)]
-    } else {
-        return coord1 || coord2
-    }
-};
 var map;
 var levels = [];
 var imageUrls = {
@@ -72,62 +43,169 @@ var groups = {
         group: L.layerGroup()
     }
 }
+var pageControl = {};
+var routeNode = []
+var dGraph = new Graph();
+dGraph.addNode(1, {weight: 1,nType: 1});
+dGraph.addNode(2, {weight: 1,nType: 1});
+dGraph.addNode(3, {weight: 1,nType: 1});
+dGraph.addNode(4, {weight: 1,nType: 1});
+dGraph.addNode(5, {weight: 1,nType: 1});
+dGraph.addNode(6, {weight: 1,nType: 1});
+dGraph.addNode(7, {weight: 1,nType: 1});
+dGraph.addNode(8, {weight: 1,nType: 1});
+dGraph.addNode(9, {weight: 1,nType: 1});
+dGraph.addNode(10, {weight: 1,nType: 1});
+dGraph.addNode(11, {weight: 1,nType: 1});
+dGraph.addNode(12, {weight: 1,nType: 1});
+dGraph.addNode(13, {weight: 1,nType: 1});
+dGraph.addNode(14, {weight: 1,nType: 1});
+dGraph.addNode(15, {weight: 1,nType: 1});
+dGraph.addNode(16, {weight: 1,nType: 1});
+dGraph.addNode(17, {weight: 1,nType: 1});
+dGraph.addNode(18, {weight: 1,nType: 1});
+dGraph.addNode(19, {weight: 1,nType: 1});
+dGraph.addNode(20, {weight: 1,nType: 1});
+//  二栋
+dGraph.addEdge(1, 2);
+dGraph.addEdge(2, 3);
+dGraph.addEdge(2, 4);
+dGraph.addEdge(4, 5);
+dGraph.addEdge(4, 6);
+dGraph.addEdge(8, 1);
+dGraph.addEdge(8, 9);
+//二三栋
+dGraph.addEdge(9, 12);
+// 三栋  二层
+dGraph.addEdge(16, 17);
+dGraph.addEdge(17, 18);
+dGraph.addEdge(18, 14);
+dGraph.addEdge(14, 15);
+dGraph.addEdge(14, 13);
+dGraph.addEdge(13, 11);
+
+// 三栋  一层
+dGraph.addEdge(10, 12);
+dGraph.addEdge(12, 19);
+dGraph.addEdge(19, 20);
+
+//三栋电梯
+dGraph.addEdge(10, 15);
+dGraph.addEdge(20, 16);
+
+
+var calcCurrentCoord = function (coord1, coord2, rssi1, rssi2) {
+
+    if (coord1 && coord2) {
+        var rssiToDistance = function (rssi) {
+            return Math.pow(10, (-59 - rssi) / 20);
+        }
+        var dis1 = rssiToDistance(rssi1),
+            dis2 = rssiToDistance(rssi2);
+        return [(coord1[0] * dis2 + coord2[0] * dis1) / (dis1 + dis2), (coord1[1] * dis2 + coord2[1] * dis1) / (dis1 + dis2)]
+    } else {
+        return coord1 || coord2
+    }
+};
 var currentLayerGroup;
 var currentPosition;
 var currentPlaceInList;
 var places = [{
-    roomName: '大厅',building: '1',level: 1,roomNo: 101,roomId: '大厅',beaconId: '9.100',routeId: 1
-    ,coord: [31.252359665779384, 121.61325934609069]
+    roomName: '2212',building: '2',level: 2,roomNo: 2212,roomId: '2212',beaconId: '9.106',routeId: 4, target: true,
+    coord: [31.252248931507214, 121.61408535250533]
 }, {
-    roomName: '大厅',building: '1',level: 1,roomNo: 1606,roomId: '大厅',beaconId: '9.101',routeId: 2,
-    coord: [31.252359665779384, 121.61317619761121]
+    roomName: '电梯',building: '2',level: 2,beaconId: '9.101',routeId: 1,
+    coord: [31.25230167043979, 121.61396197089064]
 }, {
-    roomName: '大厅',building: '1',level: 1,roomNo: 1606,roomId: '大厅',beaconId: '9.102',routeId: 3,
-    coord: [31.252359665779384, 121.61317619761121]
+    roomName: '电梯',building: '2',level: 1,beaconId: '9.8',routeId: 8,
+    coord: [31.252305083623114, 121.61397054791452]
 }, {
-    roomName: '电梯',building: '1',level: 1,roomNo: 1606,roomId: '大厅',beaconId: '9.106',routeId: 4,
-    coord: [31.252359665779384, 121.61317619761121]
+    roomName: '大厅',building: '2',level: 1,beaconId: '9.16',routeId: 9,
+    coord: [31.25222597521609, 121.61397457122803]
 }, {
-    roomName: '电梯',building: '1',level: 6,roomNo: 1606,roomId: '大厅',beaconId: '9.103',routeId: 5,
-    coord: [31.252359665779384, 121.61317619761121]
+    roomName: '走廊',building: '2',level: 2,roomNo: 306,roomId: 'D306',beaconId: '9.112',routeId: 2,
+    coord: [31.252260396495068, 121.61400488623488]
 }, {
-    roomName: '主会议室',building: '1',level: 6,roomNo: 1606,roomId: '大厅',beaconId: '9.104',routeId: 6,
-    coord: [31.252359665779384, 121.61317619761121]
+    roomName: '2203',building: '2',level: 2,roomNo: 2203,roomId: '2203',beaconId: '9.102',routeId: 6, target: false,
+    coord: [31.25219160654712, 121.61412826784957]
+},{
+    roomName: '2212',building: '2',level: 2,roomNo: 2212,roomId: '2212',beaconId: '9.114',routeId: 5, target: false,
+    coord: [31.252253517502524, 121.6142449439417]
+
 }, {
-    roomName: 'D306',building: 'D',level: 3,roomNo: 306,roomId: 'D306',beaconId: '9.105',routeId: 7,
-    coord: [22.37148391840292, 113.5702282190323]
+    roomName: '2201',building: '2',level: 2, roomNo: 2201, roomId: '2201',beaconId: '9.107',routeId: 3, target: true,
+    coord: [31.252190460047565, 121.61397940524922]
 }, {
-    roomName: 'D401',building: 'D',level: 4,roomNo: 401,roomId: 'D401',beaconId: '9.106',routeId: 8,
-    coord: [22.37180389907296, 113.57043106108905]
+    ///////////////////三栋
+    roomName: '电梯',building: '3',level: 1,roomId: 'steps4',beaconId: '9.21',routeId: 10,
+    coord: [31.251666636648512, 121.61391021354407]
 }, {
-    roomName: '楼梯#1',building: 'D',level: 3,roomId: 'steps3',beaconId: '9.107',routeId: 9,
-    coord: [22.3717264088571, 113.57041094452144]
+    roomName: '大厅',building: '3',level: 1, beaconId: '9.6',routeId: 12,
+    coord: [31.251734527528072, 121.61396576301628]
+    
 }, {
-    roomName: '楼梯#2',building: 'D',level: 3,roomId: 'steps4',beaconId: '9.108',routeId: 10,
-    coord: [22.37155706929526, 113.5702966153622]
+    roomName: '走廊',building: '3',level: 1, beaconId: '9.11',routeId: 19,
+    coord: [31.25159010047173, 121.61395003844521]
+}, {
+    roomName: '电梯',building: '3',level: 1, beaconId: '9.15',routeId: 20,
+    coord: [31.251509844957788, 121.61392858077309]
+    
+}, {
+    roomName: '3209',building: '3',level: 2, beaconId: '9.20',routeId: 11, target: true,
+    coord: [31.251385771267127, 121.61412973242138]
+}, {
+    roomName: '3208',building: '3',level: 2, beaconId: '9.9',routeId: 13, target: true, 
+    coord: [31.25147083098665, 121.61412535445267]
+}, {
+    roomName: '3207',building: '3',level: 2,routeId: 14, 
+    coord: [31.25149605416597, 121.6139858795839]
+}, {
+    roomName: '电梯',building: '3',level: 2, beaconId: '9.28',routeId: 15, 
+    coord: [31.251443314783387, 121.6138987077909]
+}, {
+    roomName: '电梯',building: '3',level: 2, beaconId: '9.17',routeId: 16, 
+    coord: [31.251673762738196, 121.61385713355118]
+}, {
+    roomName: '3206',building: '3',level: 2, beaconId: '9.27',routeId: 17, target: true, 
+    coord: [31.251655418642972, 121.61398856179291]
+}, {
+    roomName: '3206',building: '3',level: 2, beaconId: '9.14',routeId: 18, 
+    coord: [31.25156828414211, 121.61399124400192]
 }];
 var placesByRoute = R.groupBy(R.path(['routeId']))(places);
 var meMarker;
+var polyline;
 var route = function (nowPlace, targetPlace) {
     if(nowPlace && nowPlace.routeId && targetPlace && targetPlace.routeId){
         var results = Dijkstra.run(dGraph, 1, nowPlace.routeId, targetPlace.routeId);
         var path = Dijkstra.getPath(results.prev, targetPlace.routeId);
-    
-        var polyline = L.polyline(R.filter(R.path([]))(R.map(function(routeId){
-            return R.path([routeId, 0, 'level'])(placesByRoute) == currentPlaceInList.level ? R.path([routeId, 0, 'coord'])(placesByRoute) : undefined;
-        })(path)), {color: 'blue', opacity: 0.5}).addTo(map);
+        try{
+            map.removeLayer(polyline);
+        }catch(e){
+            console.log(e);
+        }
+        polyline = L.polyline(R.filter(R.path([]))(R.map(function(routeId){
+            return (R.path([routeId, 0, 'level'])(placesByRoute) == currentPlaceInList.level &&
+            R.path([routeId, 0, 'building'])(placesByRoute) == currentPlaceInList.building) ?
+             R.path([routeId, 0, 'coord'])(placesByRoute) : undefined;
+        })(path)), {color: '#057bff', opacity: 0.5}).addTo(map);
         
         var disPlace = R.path([0])(R.filter(R.propEq('routeId')(R.path([1])(path)))(places))
         if(disPlace){
+            if(!disPlace.beaconId){
+                disPlace = R.path([0])(R.filter(R.propEq('routeId')(R.path([2])(path)))(places))
+            }
             var direction;
-            if(nowPlace.level == targetPlace.level){
+            if(nowPlace.level == disPlace.level){
                 direction = '前进至';
-            }else if(nowPlace.level > targetPlace.level){
+                this.routers = direction + R.path(['roomName'])(disPlace);
+            }else if(nowPlace.level > disPlace.level){
                 direction = '下楼至'
+                this.routers = direction + disPlace.level + "楼";
             }else {
                 direction = '上楼至'
+                this.routers = direction + disPlace.level + "楼";
             }
-            this.routers = direction + R.path(['roomName'])(disPlace);
             map.closePopup();
             var popup = L.popup()
             .setLatLng(R.path(['coord'])(disPlace))
@@ -157,6 +235,11 @@ vueMap = new Vue({
     methods: {
         chooseTarget: function () {
             document.getElementById('select-target').focus();
+        },
+        filterTarget: function(arr){
+            return R.filter(function(obj){
+                return obj.target == true;
+            })(arr);
         }
     },
     watch: {
@@ -171,6 +254,11 @@ vueMap = new Vue({
             }
             if(newPlace){
                 meMarker.setLatLng(newPlace);
+                if(currentPlaceInList.building == 2 || currentPlaceInList.building == 3){
+                    map.setView(newPlace, 20);
+                }else{
+                    map.panTo(newPlace);
+                }
                 route.call(this, currentPlaceInList, this.target);
             };
         }
@@ -178,7 +266,7 @@ vueMap = new Vue({
     mounted: function mounted() {
         map = L.map("map", {
             center: [31.252318904299297, 121.61386728286745],
-            zoom: 20,
+            zoom: 19,
             zoomControl: true
         });
         
@@ -224,35 +312,52 @@ vueMap = new Vue({
                 setRotate(orental)
             }
         }.bind(this), true);
-        // createLevels(indoorLevel);
-        // drawIndoor(indoorMapData);
         var beaconArray = {};
         var meanRssiArray = {};
         var tmpBeaconArray = [];
         
-        // var bleCallback = ;
 
-        try{
+        setInterval(function(){
             window.rh.startBleScan({}, function (beaconInfo) {
-                // this.log = JSON.stringify(beaconInfo);
-                if(typeof beaconInfo == 'string'){
-                    beaconInfo = JSON.parse(beaconInfo);
+                if(beaconInfo == null){
+                    return;
                 }
-                if(beaconInfo && beaconInfo.length && beaconInfo.length != 0){
-                    (tmpBeaconArray = R.concat(tmpBeaconArray, R.filter(R.propEq('major')(9))(beaconInfo)));
-                } 
+                rh.endBleScan();
+                try{
+                    if(typeof beaconInfo == 'string'){
+                        beaconInfo = JSON.parse(beaconInfo);
+                    }
+                    if(beaconInfo && beaconInfo.length && beaconInfo.length != 0){
+                        (tmpBeaconArray = R.concat(tmpBeaconArray, R.filter(function(obj){
+                            return R.propEq('major')(9)(obj) && R.path(['rssi'])(obj) < 0 && R.path(['rssi'])(obj) > -100
+                        })(beaconInfo)));
+                    } 
+                }catch(e){
+                    alert(e);
+                }
             }.bind(this), function(err){
                 this.log = err
             }.bind(this));
-        }catch(e){
-            alert(e);
-        }
+
+        }.bind(this), 400);
         
-        // pageControl.onPostMessage = 
-        
-        // pageControl.bleScan(scanBackcall);
         var tmpKalmanObj = {};
+        // var noBleFlag = false;
+        var noBleTimer;
         setInterval(function () {
+            if(tmpBeaconArray && tmpBeaconArray.length == 0){
+                if(!noBleTimer){
+                    noBleTimer = setTimeout(function(){
+                        // alert('未搜索到蓝牙信号，请确保蓝牙已打开，且在绿色区域内');
+                        noBleTimer = undefined;
+                    }.bind(this), 10000);
+                }
+            }else{
+                if(noBleTimer){
+                    clearTimeout(noBleFlag);
+                    noBleTimer = undefined;
+                } 
+            }
             var filteredArray = R.filter(function (beaconInfo) {
                 return beaconInfo.rssi > -100 && beaconInfo.rssi < 5;
             })(R.forEach(function (beaconInfo) {
@@ -300,9 +405,9 @@ vueMap = new Vue({
             // meMarker.setLatLng(this.currentPlace.coord);
             
             beaconArray = {};
-        }.bind(this), 3000);
+        }.bind(this), 2500);
         setTimeout(function(){
-            map.setView([31.25245174500533, 121.61321564166883], 19);
-        }, 500)
+            map.setView([31.25245174500533, 121.61321564166883], 20);
+        }, 1000)
     }
 });

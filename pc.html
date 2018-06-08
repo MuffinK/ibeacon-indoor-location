@@ -24,10 +24,10 @@
 	<script src="leaflet/Leaflet.ImageOverlay.Rotated.js"></script>
 	<script src="leaflet/ramda.min.js"></script>
 	<script src="leaflet/graph-dijkstra.min.js"></script>
-	<script src="leaflet/kalman.es5.js"></script>
+    <script src="leaflet/kalman.es5.js"></script>
+    <!-- <script src="https://cdn.bootcss.com/mint-ui/2.2.13/mint-ui.common.min.js"></script>
+    <link href="https://cdn.bootcss.com/mint-ui/2.2.13/style.min.css" rel="stylesheet"> -->
     <script>
-        Vue.config.devtools = true;
-Vue.config.debug = true
         rh = {
             startBleScan: function(){}
         }
@@ -110,7 +110,7 @@ Vue.config.debug = true
 				</div>
 				<select name="" id="select-target" v-model='target'>
 					<option value="" disabled>请选择</option>
-					<option :value="room" :label="room.roomName" v-for='room in targetRooms'>{{room.roomName}}</option>
+					<option :value="room" :label="room.roomName" v-for='room in filterTarget(targetRooms)'>{{room.roomName}}</option>
 				</select>
 			</div>
 				<!-- <div>
