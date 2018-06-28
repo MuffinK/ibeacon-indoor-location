@@ -258,9 +258,33 @@ vueMap = new Vue({
     methods: {
         chooseTarget: function () {
             document.getElementById('select-target').focus();
-            navigator.bluetooth.requestDevice()
-            .then(device => { console.log(device) })
-            .catch(error => { console.log(error); });
+            var known_service = "A service in the iBeacon’s GATT server";
+            navigator.bluetooth.requestDevice({
+                filters: [{services: [known_service]}]
+            }).then(device => {
+                device.watchAdvertisements();
+                device.addEventListener('advertisementreceived', interpretIBeacon);
+            });
+
+            function interpretIBeacon(event) {
+                var rssi = event.rssi;
+                var appleData = event.manufacturerData.get(0x004C);
+                if (appleData.byteLength != 23 ||
+                    appleData.getUint16(0, false) !== 0x0215) {
+                    console.log({isBeacon: false});
+                }
+                var uuidArray = new Uint8Array(appleData.buffer, 2, 16);
+                var major = appleData.getUint16(18, false);
+                var minor = appleData.getUint16(20, false);
+                var txPowerAt1m = -appleData.getInt8(22);
+                console.log({
+                    isBeacon: true,
+                    uuidArray,
+                    major,
+                    minor,
+                    pathLossVs1m: txPowerAt1m - rssi
+                });
+            };
         },
         filterTarget: function(arr){
             return R.filter(function(obj){
@@ -344,26 +368,18 @@ vueMap = new Vue({
         
 
         setInterval(function(){
-            window.rh.startBleScan({}, function (beaconInfo) {
-                if(beaconInfo == null){
-                    return;
+            try{
+                if(typeof beaconInfo == 'string'){
+                    beaconInfo = JSON.parse(beaconInfo);
                 }
-                rh.endBleScan();
-                try{
-                    if(typeof beaconInfo == 'string'){
-                        beaconInfo = JSON.parse(beaconInfo);
-                    }
-                    if(beaconInfo && beaconInfo.length && beaconInfo.length != 0){
-                        (tmpBeaconArray = R.concat(tmpBeaconArray, R.filter(function(obj){
-                            return R.propEq('major')(9)(obj) && R.path(['rssi'])(obj) < 0 && R.path(['rssi'])(obj) > -100
-                        })(beaconInfo)));
-                    } 
-                }catch(e){
-                    alert(e);
-                }
-            }.bind(this), function(err){
-                this.log = err
-            }.bind(this));
+                if(beaconInfo && beaconInfo.length && beaconInfo.length != 0){
+                    (tmpBeaconArray = R.concat(tmpBeaconArray, R.filter(function(obj){
+                        return R.propEq('major')(9)(obj) && R.path(['rssi'])(obj) < 0 && R.path(['rssi'])(obj) > -100
+                    })(beaconInfo)));
+                } 
+            }catch(e){
+                alert(e);
+            }
 
         }.bind(this), 400);
         
