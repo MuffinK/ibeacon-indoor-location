@@ -1,12 +1,13 @@
+
 var map;
 var levels = [];
 var imageUrls = {
-    '1-1': 'maps/1-1.svg',
-    '1-6': 'maps/1-6.svg',
-    '2-1': 'maps/2-1.svg',
-    '2-2': 'maps/2-2.svg',
-    '3-1': 'maps/3-1.svg',
-    '3-2': 'maps/3-2.svg'
+    '1-1': 'svg/1-1.svg',
+    '1-6': 'svg/1-6.svg',
+    '2-1': 'svg/2-1.svg',
+    '2-2': 'svg/2-2.svg',
+    '3-1': 'svg/3-1.svg',
+    '3-2': 'svg/3-2.svg'
 };
 var imageBounds = {
     1: [
@@ -15,14 +16,14 @@ var imageBounds = {
         L.latLng([31.252254736217314, 121.61278769373897])
     ],
     2: [
+        L.latLng([31.25234323889825, 121.61389799691509]),
         L.latLng([31.25234323889825, 121.61444248534508]),
-        L.latLng([31.25211355882389, 121.61444248534508]),
-        L.latLng([31.25234323889825, 121.61389799691509])
+        L.latLng([31.25211355882389, 121.61389799691509])
     ],
     3: [
+        L.latLng([31.251763275689502, 121.61386516398126]),
         L.latLng([31.251763275689502, 121.61423941947763]),
-        L.latLng([31.25134066674354, 121.61423941947763]),
-        L.latLng([31.251763275689502, 121.61386516398126])
+        L.latLng([31.25134066674354, 121.61386516398126])
     ]
 };
 
@@ -66,6 +67,9 @@ dGraph.addNode(17, {weight: 1,nType: 1});
 dGraph.addNode(18, {weight: 1,nType: 1});
 dGraph.addNode(19, {weight: 1,nType: 1});
 dGraph.addNode(20, {weight: 1,nType: 1});
+dGraph.addNode(21, {weight: 1,nType: 1});
+dGraph.addNode(22, {weight: 1,nType: 1});
+dGraph.addNode(23, {weight: 1,nType: 1});
 //  二栋
 dGraph.addEdge(1, 2);
 dGraph.addEdge(2, 3);
@@ -117,6 +121,19 @@ var currentLayerGroup;
 var currentPosition;
 var currentPlaceInList;
 var places = [{
+    roomName: '主会场',building: '1',level: 6, beaconId: '9.109',routeId: 20, target: true, 
+    coord: [31.252403333091145, 121.61293986719105]
+}, {
+    roomName: '大厅',building: '1',level: 1, beaconId: '9.105',routeId: 21, 
+    coord: [31.252313906284428, 121.61318931262942]
+}, {
+    roomName: '走廊',building: '1',level: 1, beaconId: '9.108',routeId: 22, 
+    coord: [31.252415944557082, 121.61306593101473]
+}, {
+    roomName: '电梯', building: '1',level: 1, beaconId: '9.111',routeId: 23, 
+    coord: [31.25240677258201, 121.61293718498202]
+    ////////////////////
+}, {
     roomName: '2212',building: '2',level: 2,roomNo: 2212,roomId: '2212',beaconId: '9.106',routeId: 4, target: true,
     coord: [31.252248931507214, 121.61408535250533]
 }, {
@@ -129,17 +146,17 @@ var places = [{
     roomName: '大厅',building: '2',level: 1,beaconId: '9.16',routeId: 9,
     coord: [31.25222597521609, 121.61397457122803]
 }, {
-    roomName: '走廊',building: '2',level: 2,roomNo: 306,roomId: 'D306',beaconId: '9.112',routeId: 2,
+    roomName: '走廊',building: '2',level: 2,beaconId: '9.112',routeId: 2,
     coord: [31.252260396495068, 121.61400488623488]
 }, {
-    roomName: '2203',building: '2',level: 2,roomNo: 2203,roomId: '2203',beaconId: '9.102',routeId: 6, target: false,
+    roomName: '2203',building: '2',level: 2,beaconId: '9.102',routeId: 6, target: false,
     coord: [31.25219160654712, 121.61412826784957]
 },{
-    roomName: '2212',building: '2',level: 2,roomNo: 2212,roomId: '2212',beaconId: '9.114',routeId: 5, target: false,
+    roomName: '2212',building: '2',level: 2,beaconId: '9.114',routeId: 5, target: false,
     coord: [31.252253517502524, 121.6142449439417]
 
 }, {
-    roomName: '2201',building: '2',level: 2, roomNo: 2201, roomId: '2201',beaconId: '9.107',routeId: 3, target: true,
+    roomName: '2201',building: '2',level: 2,beaconId: '9.107',routeId: 3, target: true,
     coord: [31.252190460047565, 121.61397940524922]
 }, {
     ///////////////////三栋
@@ -177,19 +194,6 @@ var places = [{
 }, {
     roomName: '3206',building: '3',level: 2, beaconId: '9.14',routeId: 18, 
     coord: [31.25156828414211, 121.61399124400192]
-    // 一栋
-}, {
-    roomName: '主会场',building: '1',level: 6, beaconId: '9.109',routeId: 20, target: true, 
-    coord: [31.252403333091145, 121.61293986719105]
-}, {
-    roomName: '大厅',building: '1',level: 6, beaconId: '9.105',routeId: 21, target: true, 
-    coord: [31.252313906284428, 121.61318931262942]
-}, {
-    roomName: '走廊',building: '1',level: 6, beaconId: '9.108',routeId: 22, target: true, 
-    coord: [31.252415944557082, 121.61306593101473]
-}, {
-    roomName: '电梯', building: '1',level: 6, beaconId: '9.111',routeId: 23, target: true, 
-    coord: [31.25240677258201, 121.61293718498202]
 }];
 var placesByRoute = R.groupBy(R.path(['routeId']))(places);
 var meMarker;
@@ -254,6 +258,9 @@ vueMap = new Vue({
     methods: {
         chooseTarget: function () {
             document.getElementById('select-target').focus();
+            navigator.bluetooth.requestDevice()
+            .then(device => { console.log(device) })
+            .catch(error => { console.log(error); });
         },
         filterTarget: function(arr){
             return R.filter(function(obj){
@@ -405,13 +412,18 @@ vueMap = new Vue({
                     rssi: finalRssi
                 };
             })(groupedBeacon);
-            
             tmpKalmanObj = meanedBeacon;
             
             var sortedBeacon = R.reverse(R.sortBy(R.path([1, 'rssi']))(R.toPairs(meanedBeacon)));
             
-            var firstPlace = R.path([0])(R.filter(R.propEq('beaconId')(R.path([0, 0])(sortedBeacon)))(places));
-            var secPlace = R.path([0])(R.filter(R.propEq('beaconId')(R.path([1, 0])(sortedBeacon)))(places));
+            var firstPlace = R.path([0, 0])(sortedBeacon) && R.path([0])(R.filter(R.propEq('beaconId')(R.path([0, 0])(sortedBeacon)))(places));
+            var secPlace = R.path([1, 0])(sortedBeacon) && R.path([0])(R.filter(R.propEq('beaconId')(R.path([1, 0])(sortedBeacon)))(places));
+
+            if(!firstPlace){
+                this.routers = '未搜索到蓝牙信号'
+            }else{
+                this.routers = this.routers == '未搜索到蓝牙信号'? '': this.routers
+             }
             // console.log(R.map(o=>[R.path([0])(o), R.path([1, 'rssi'])(o)].join(','))(sortedBeacon))
             this.currentPlace = calcCurrentCoord(
                 R.path(['coord'])(firstPlace),

@@ -2,34 +2,29 @@
 <html lang="en">  
 <head>  
 	<meta charset="UTF-8">  
-	<title>addBooking</title>
+	<title>室内导航</title>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black">
-
+	<link rel="manifest" href="/indoor/manifest.json">
 	<meta name="description" content="">
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.css">
-	<link rel="stylesheet" href="leaflet/leaflet-compass.min.css">
-	<link rel="stylesheet" href="leaflet/L.Control.Locate.min.css">
-	<link rel="stylesheet" href="leaflet/L.Control.Rose.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.2.0/leaflet.js"></script>
-	<script src="leaflet/L.Control.Locate.min.js"></script>
-	<script src="leaflet/proj4-compressed.js"></script>
-	<script src="leaflet/proj4leaflet.js"></script>
 	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-	<!-- <script src="leaflet/L.Control.Rose.js"></script> -->
-	<script src="leaflet/leaflet-bing-layer.min.js"></script>
 	<script src="leaflet/Leaflet.ImageOverlay.Rotated.js"></script>
 	<script src="leaflet/ramda.min.js"></script>
 	<script src="leaflet/graph-dijkstra.min.js"></script>
     <script src="leaflet/kalman.es5.js"></script>
-    <!-- <script src="https://cdn.bootcss.com/mint-ui/2.2.13/mint-ui.common.min.js"></script>
-    <link href="https://cdn.bootcss.com/mint-ui/2.2.13/style.min.css" rel="stylesheet"> -->
     <script>
         rh = {
-            startBleScan: function(){}
+            startBleScan: function({}, a){
+				setInterval(function(){
+					a([{'rssi': -8, major: 9, minor: 21}]);
+				}, 1000)
+			},
+			endBleScan: function(){}
         }
     </script>
 	<style >
@@ -70,16 +65,16 @@
 			border: transparent;
 		}
 		#routers{
-			padding: 5px;
+			/* padding: 5px; */
 			font-size: 26px;
 			width: 70vw;
 			margin: auto;
 			text-align: center;
 		}
 		#target-place{
-			padding: 5px;
+			/* padding: 5px; */
 			font-size: 18px;
-			width: 20vw;
+			width: 23vw;
 			margin: auto;
 			text-align: center;
 		}
@@ -120,5 +115,19 @@
 		</div>
 	</div>
 </body>  
-<script src="script.es5.js?m=6"></script>
+<script>
+	var workerContainerInstance = navigator.serviceWorker;
+	if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/indoor/sw.js').then(function(registration) {
+        // Registration was successful
+        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      }).catch(function(err) {
+        // registration failed :(
+        console.log('ServiceWorker registration failed: ', err);
+      });
+    });
+  };
+</script>
+<script src="script.es5.js"></script>
 </html>  
