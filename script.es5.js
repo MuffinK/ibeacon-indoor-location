@@ -258,33 +258,30 @@ vueMap = new Vue({
     methods: {
         chooseTarget: function () {
             document.getElementById('select-target').focus();
-            var known_service = "A service in the iBeacon’s GATT server";
-            navigator.bluetooth.requestDevice({
-                filters: [{services: [known_service]}]
-            }).then(device => {
-                device.watchAdvertisements();
-                device.addEventListener('advertisementreceived', interpretIBeacon);
-            });
-
-            function interpretIBeacon(event) {
-                var rssi = event.rssi;
-                var appleData = event.manufacturerData.get(0x004C);
-                if (appleData.byteLength != 23 ||
-                    appleData.getUint16(0, false) !== 0x0215) {
-                    console.log({isBeacon: false});
+            var known_service = "fda50693-a4e2-4fb1-afcf-c6eb07647825";
+            navigator.bluetooth.requestLEScan({
+                filters: [{manufacturerData: {0x004C: {dataPrefix: new Uint8Array([
+                  0x02, 0x15, // iBeacon identifier.
+                  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15  // My beacon UUID.
+                ])}}}],
+                options: {
+                  keepRepeatedDevices: true,
                 }
-                var uuidArray = new Uint8Array(appleData.buffer, 2, 16);
-                var major = appleData.getUint16(18, false);
-                var minor = appleData.getUint16(20, false);
-                var txPowerAt1m = -appleData.getInt8(22);
-                console.log({
-                    isBeacon: true,
-                    uuidArray,
-                    major,
-                    minor,
-                    pathLossVs1m: txPowerAt1m - rssi
+              }).then(() => {
+                navigator.bluetooth.addEventListener('advertisementreceived', event => {
+                  let appleData = event.manufacturerData.get(0x004C);
+                  if (appleData.byteLength != 23) {
+                    // Isn’t an iBeacon.
+                    return;
+                  }
+                  let major = appleData.getUint16(18, false);
+                  let minor = appleData.getUint16(20, false);
+                  let txPowerAt1m = -appleData.getInt8(22);
+                  let pathLossVs1m = txPowerAt1m - event.rssi;
+              
+                  recordNearbyBeacon(major, minor, pathLossVs1m);
                 });
-            };
+              })
         },
         filterTarget: function(arr){
             return R.filter(function(obj){
@@ -367,21 +364,21 @@ vueMap = new Vue({
         var tmpBeaconArray = [];
         
 
-        setInterval(function(){
-            try{
-                if(typeof beaconInfo == 'string'){
-                    beaconInfo = JSON.parse(beaconInfo);
-                }
-                if(beaconInfo && beaconInfo.length && beaconInfo.length != 0){
-                    (tmpBeaconArray = R.concat(tmpBeaconArray, R.filter(function(obj){
-                        return R.propEq('major')(9)(obj) && R.path(['rssi'])(obj) < 0 && R.path(['rssi'])(obj) > -100
-                    })(beaconInfo)));
-                } 
-            }catch(e){
-                alert(e);
-            }
+        // setInterval(function(){
+        //     try{
+        //         if(typeof beaconInfo == 'string'){
+        //             beaconInfo = JSON.parse(beaconInfo);
+        //         }
+        //         if(beaconInfo && beaconInfo.length && beaconInfo.length != 0){
+        //             (tmpBeaconArray = R.concat(tmpBeaconArray, R.filter(function(obj){
+        //                 return R.propEq('major')(9)(obj) && R.path(['rssi'])(obj) < 0 && R.path(['rssi'])(obj) > -100
+        //             })(beaconInfo)));
+        //         } 
+        //     }catch(e){
+        //         alert(e);
+        //     }
 
-        }.bind(this), 400);
+        // }.bind(this), 400);
         
         var tmpKalmanObj = {};
         // var noBleFlag = false;
